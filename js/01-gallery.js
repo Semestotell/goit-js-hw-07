@@ -1,28 +1,39 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
-const gallery = document.querySelector(".gallery");
-const modal = document.querySelector(".lightbox");
-const modalImg = document.querySelector(".lightbox__image");
+const galleryContainer = document.querySelector('.gallery');
+const body = document.querySelector('body');
 
-const markup = galleryItems.map(
-    ({ preview, description, original}, index) =>
-        `<li class= "gallery__item">
-        <a class="gallery__item" href="">
-        <img class="gallery__image" src="${preview}" alt="${description} data-source="${original}" data-index="${index}"/>
-        </a>
-        </li>`
-)
+function markup(galleryItems) {
+    return galleryItems.map(({ preview, original, description }) => {
+        return `
+            <div class="gallery__item">
+                <a class="gallery__link" href="${original}">
+                    <img
+                        class="gallery__image"
+                        src="${preview}"
+                        data-source="${original}"
+                        alt="${description}"
+                    />
+                </a>
+            </div>`;
+    })
     .join('');
-gallery.insertAdjacentHTML('afterbegin', markup);
+}
+galleryContainer.innerHTML = markup(galleryItems);
 
-const openModal = e => {
-    e.preventDefault()
-    if (e.target.localName === "img") {
-        modalImg.alt = e.target.alt;
-        modalImg.src = e.target.dataset.source;
-        modalImg.dataset.index = e.target.dataset.index;
-
-        modal.classList.add("is-open");
+let instance;
+galleryContainer.addEventListener('click', onClickImg);
+function onClickImg(event) {
+    event.preventDefault();
+    const img = event.target;
+    if (!img.classList.contains('gallery__image')) {
+    return;
     }
-};
-gallery.addEventListener('click', openModal);
+    instance = basicLightbox.create(`<img src="${img.dataset.source}">`);
+    instance.show(onShow);
+}
+function onShow(instance) {
+    body.style.overflow = 'hidden';
+}
+
+
